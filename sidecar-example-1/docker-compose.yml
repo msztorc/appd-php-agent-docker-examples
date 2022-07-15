@@ -1,0 +1,67 @@
+version: '3.8'
+services:
+
+ # sidecar proxy service
+  appd-proxy:
+    image: msztorc/appd-php-agent-proxy:22.3.0
+    tty: true
+    volumes:
+      - appd-logs:/appd/logs/
+      - appd-ctrl:/appd/ctrl/
+    env_file: ./.env
+    restart: always
+    networks:
+      - app-network
+
+  # php job
+  job:
+    image: appd-php-cli
+    build:
+      context: .
+      dockerfile: ./docker/php-cli/Dockerfile
+      args:
+        - AGENT_PATH=${AGENT_PATH}
+        - AGENT_VERSION=${AGENT_VERSION}
+        - AGENT_LOGS_PATH=${AGENT_LOGS_PATH}
+        - AGENT_CTRL_PATH=${AGENT_CTRL_PATH}
+        - APPDYNAMICS_CONTROLLER_SSL_ENABLED=${APPDYNAMICS_CONTROLLER_SSL_ENABLED}
+        - APPDYNAMICS_AGENT_ACCOUNT_NAME=${APPDYNAMICS_AGENT_ACCOUNT_NAME}
+        - APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY=${APPDYNAMICS_AGENT_ACCOUNT_ACCESS_KEY}
+        - APPDYNAMICS_CONTROLLER_HOST_NAME=${APPDYNAMICS_CONTROLLER_HOST_NAME}
+        - APPDYNAMICS_CONTROLLER_PORT=${APPDYNAMICS_CONTROLLER_PORT}
+        - APPDYNAMICS_AGENT_APPLICATION_NAME=${APPDYNAMICS_AGENT_APPLICATION_NAME}
+        - APPDYNAMICS_AGENT_TIER_NAME=${APPDYNAMICS_AGENT_TIER_NAME}
+        - APPDYNAMICS_AGENT_NODE_NAME=${APPDYNAMICS_AGENT_NODE_NAME}
+        - APPDYNAMICS_HTTP_PROXY_HOST=${APPDYNAMICS_HTTP_PROXY_HOST}
+        - APPDYNAMICS_HTTP_PROXY_PORT=${APPDYNAMICS_HTTP_PROXY_PORT}
+        - APPDYNAMICS_HTTP_PROXY_USER=${APPDYNAMICS_HTTP_PROXY_USER}
+        - APPDYNAMICS_HTTP_PROXY_PASSWORD_FILE=${APPDYNAMICS_HTTP_PROXY_PASSWORD_FILE}
+    tty: true
+    depends_on:
+      - appd-proxy
+    volumes:
+      - php-vol-1:/src/
+      - appd-logs:/appd/logs/
+      - appd-ctrl:/appd/ctrl/
+    working_dir: /src/
+    env_file: ./.env
+    networks:
+      - app-network
+
+# Docker Networks
+networks:
+  app-network:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: "appd-bridge"
+
+# Volumes
+volumes:
+  php-vol-1:
+    driver_opts:
+      type: none
+      device: ./src/
+      o: bind
+
+  appd-ctrl:
+  appd-logs:
