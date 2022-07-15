@@ -26,8 +26,8 @@ services:
         - APPDYNAMICS_HTTP_PROXY_PASSWORD_FILE=${APPDYNAMICS_HTTP_PROXY_PASSWORD_FILE}
     tty: true
     volumes:
-      - appd-logs:/appd/logs/
-      - appd-ctrl:/appd/ctrl/
+      - appd-logs:/tmp/appd/logs/
+      - appd-ctrl:/tmp/appd/ctrl/
     env_file: ./.env
     restart: always
     networks:
@@ -61,8 +61,8 @@ services:
       - appd-proxy
     volumes:
       - php-vol-1:/src/
-      - appd-logs:/appd/logs/
-      - appd-ctrl:/appd/ctrl/
+      - appd-logs:/tmp/appd/logs/
+      - appd-ctrl:/tmp/appd/ctrl/
     working_dir: /src/
     env_file: ./.env
     networks:
