@@ -18,6 +18,9 @@ Short-lived job container - uses prebuilt image `msztorc/appd-php-agent-proxy`
   ...
 ```
 
+Image tags: https://hub.docker.com/r/msztorc/appd-php-agent-proxy/tags
+
+
 **.env file**
 
 ```ini
